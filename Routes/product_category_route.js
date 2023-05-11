@@ -1,6 +1,6 @@
 const express = require("express")
 const productCategoryRoute = express.Router()
-const productCategory = require("../Models/productCategory")
+const productCategory = require("../Models/product_category")
 
 productCategoryRoute.route("/create").post((req,res)=>{
     const {productCatrgoryName}=req.body

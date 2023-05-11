@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
-const productCategory = require("./productCategory");
+const productCategory = require("./product_category");
 const seller = require("./seller"); 
 
 const prodoutsSchema = new Schema({
