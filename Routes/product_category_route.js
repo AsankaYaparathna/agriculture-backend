@@ -8,13 +8,22 @@ productCategoryRoute.route("/create").post((req,res)=>{
         productCatrgoryName,
     })
     
-    productcategory.save().then((productcategory)=>{
+    productCategory.save().then((productcategory)=>{
         res.status(200).send({status: "success",productcategory})
     }).catch((e)=>{
         res.status(400).send({status: "faliure"})
-    })
-})
+    });
+});
 
+productCategoryRoute.route("/get-all").get((req,res)=>{
+    productCategory.find()
+    .then((product) => {
+      res.status(200).send({ status: true, data:product });
+    })
+    .catch((e) => {
+      res.status(400).send({ status: false });
+    });
+});
 
 
 module.exports =productCategoryRoute
