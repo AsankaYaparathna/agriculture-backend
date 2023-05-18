@@ -36,9 +36,9 @@ sellerRoute.route("/get-all").get((req, res) => {
 });
 
 sellerRoute.route("/login").post((req,res)=>{
-  const {sellerEmail,sellerPassword}=req.body;
+  const {sellerContactNumber,sellerPassword}=req.body;
 
-  Seller.find({sellerEmail : sellerEmail,sellerPassword: sellerPassword})
+  Seller.find({sellerContactNumber : sellerContactNumber,sellerPassword: sellerPassword})
   .then((model) => {
       console.log(model);
       if(Array.isArray(model) && model.length > 0){

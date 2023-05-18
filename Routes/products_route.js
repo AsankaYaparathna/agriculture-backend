@@ -5,7 +5,7 @@ const Products = require("../Models/products")
 productsRoute.route("/save").post((req,res)=>{
 
     const {productName,price,productImage,description,productCatogoryId,AvailableQuantity,sellerId}=req.body
-    const Products = new Products({
+    const Product = new Products({
         productName,
         price,
         productImage,
@@ -13,9 +13,11 @@ productsRoute.route("/save").post((req,res)=>{
         productCatogoryId,
         AvailableQuantity,
         sellerId
-    })
+    });
+
     
-    Products.save().then((product)=>{
+    
+    Product.save().then((product)=>{
         res.status(200).send({status: "success",product})
     }).catch((e)=>{
         res.status(400).send({status: "faliure"})
