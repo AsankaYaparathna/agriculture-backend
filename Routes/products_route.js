@@ -52,10 +52,7 @@ productsRoute.route("/user-produts/:id").get((req,res)=>{
       res.status(400).send({ status: false });
     });
   });
-  
 
-
-  
   productsRoute.route("/user-produts-count/:id").get(async (req, res) => {
     try {
       const { id } = req.params;
@@ -90,6 +87,47 @@ productsRoute.route("/user-produts/:id").get((req,res)=>{
       console.error(error);
       res.status(400).send({ status: false });
     }
+  });
+
+  productsRoute.route("/delete/:id").post((req, res) => {
+    const { id } = req.params;
+  
+    Product.findByIdAndDelete(id)
+      .then((product) => {
+        if (product) {
+          res.status(200).send({ status: "success", product });
+        } else {
+          res.status(404).send({ status: "failure", message: "Product not found" });
+        }
+      })
+      .catch((error) => {
+        res.status(500).send({ status: "failure", message: "Internal server error" });
+      });
+  });
+  
+  productsRoute.route("/edit/:id").post((req, res) => {
+    const { id } = req.params;
+    const { productName, price, productImage, description, productCatogoryId, availableQuantity, sellerId } = req.body;
+  
+    Product.findByIdAndUpdate(id, {
+      productName,
+      price,
+      productImage,
+      description,
+      productCatogoryId,
+      availableQuantity,
+      sellerId
+    })
+      .then((product) => {
+        if (product) {
+          res.status(200).send({ status: "success", product });
+        } else {
+          res.status(404).send({ status: "failure", message: "Product not found" });
+        }
+      })
+      .catch((error) => {
+        res.status(500).send({ status: "failure", message: "Internal server error" });
+      });
   });
   
 

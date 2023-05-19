@@ -3,7 +3,7 @@ const sellerRoute = express.Router()
 const Seller = require("../Models/seller")
 
 sellerRoute.route("/save").post((req,res)=>{
-    const {sellerFirstName,sellerLastName,sellerImage,AvailableQuantity,sellerAdddress,sellerContactNumber,sellerLocation,sellerPassword,sellerEmail}=req.body
+    const {sellerFirstName,sellerLastName,sellerImage,AvailableQuantity,sellerAdddress,sellerContactNumber,sellerLocation,sellerPassword,sellerEmail,latitude,longitude}=req.body
     const seller = new Seller({
         sellerFirstName,
         sellerLastName,
@@ -13,7 +13,9 @@ sellerRoute.route("/save").post((req,res)=>{
         sellerContactNumber,
         sellerLocation,
         sellerPassword,
-        sellerEmail
+        sellerEmail,
+        latitude,
+        longitude
     })
     
     seller.save().then((seller)=>{
@@ -68,7 +70,7 @@ sellerRoute.route("/login").post((req,res)=>{
 
 sellerRoute.route("/update/:id").put((req,res)=>{
   const { id } = req.params;
-  const {sellerFirstName,sellerLastName,sellerImage,AvailableQuantity,sellerAdddress,sellerContactNumber,sellerLocation,sellerPassword}=req.body
+  const {sellerFirstName,sellerLastName,sellerImage,AvailableQuantity,sellerAdddress,sellerContactNumber,sellerLocation,sellerPassword,latitude,longitude}=req.body
   const seller = new Seller({
       sellerFirstName,
       sellerLastName,
@@ -77,7 +79,9 @@ sellerRoute.route("/update/:id").put((req,res)=>{
       sellerAdddress,
       sellerContactNumber,
       sellerLocation,
-      sellerPassword
+      sellerPassword,
+      latitude,
+      longitude
   })
   
   seller.findByIdAndUpdate(id,seller,{new:true}).then((seller)=>{

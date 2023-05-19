@@ -11,6 +11,8 @@ const sellerSchema = new mongoose.Schema({
   sellerLocation: {type: String,},
   sellerPassword: {type: String,},
   sellerEmail: {type: String,},
+  latitude: {type: String,},
+  longitude: {type: String,},
 },
 {collection:"sellers"}
 );
