@@ -40,7 +40,6 @@ productsRoute.route("/user-produts/:id").get((req,res)=>{
     const { id } = req.params;
     Products.find({sellerId : id})
     .then((model) => {
-        //console.log(model);
         if(Array.isArray(model) && model.length > 0){
             res.status(200).send({ status: true, data: model });
         }
@@ -54,25 +53,43 @@ productsRoute.route("/user-produts/:id").get((req,res)=>{
     });
   });
   
-  productsRoute.route("/user-produts-withCategory/:id").get((req,res)=>{
-    const { id } = req.params;
-    var cat = productCategory.find();
 
-    console.log('cat',cat);
-    Products.find({sellerId : id})
-    .then((model) => {
-       // console.log(model);
-        if(Array.isArray(model) && model.length > 0){
-            res.status(200).send({ status: true, data: model });
+
+  
+  productsRoute.route("/user-produts-count/:id").get(async (req, res) => {
+    try {
+      const { id } = req.params;
+      let fruitCount = 0;
+      let vegCount = 0;
+      let otherCount = 0;
+  
+      const modelP = await Products.find({ sellerId: id });
+  
+      if (Array.isArray(modelP) && modelP.length > 0) {
+        const modelC = await productCategory.find();
+  
+        if (Array.isArray(modelC) && modelC.length > 0) {
+          const catFruit = modelC.find((product) => product.productCatrgoryName === 'fruits');
+          const catVeg = modelC.find((product) => product.productCatrgoryName === 'vegitable');
+          const catOther = modelC.find((product) => product.productCatrgoryName === 'other');
+  
+          fruitCount = modelP.filter((product) => product.productCatogoryId.toString() === catFruit._id.toString()).length;
+          vegCount = modelP.filter((product) => product.productCatogoryId.toString() === catVeg._id.toString()).length;
+          otherCount = modelP.filter((product) => product.productCatogoryId.toString() === catOther._id.toString()).length;
+  
+          console.log("Fruit Count:", fruitCount);
+          console.log("Veg Count:", vegCount);
+          console.log("Other Count:", otherCount);
+  
+          res.status(200).send({ fruitCount, vegCount, otherCount });
         }
-        else{
-            res.status(400).send({ status: false });
-        }
-      
-    })
-    .catch((e) => {
+      } else {
+        res.status(400).send({ status: false });
+      }
+    } catch (error) {
+      console.error(error);
       res.status(400).send({ status: false });
-    });
+    }
   });
   
 
