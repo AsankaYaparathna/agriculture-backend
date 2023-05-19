@@ -36,14 +36,25 @@ customerRoute.route("/login").post((req,res)=>{
       res.status(400).send({ status: false });
     });
 
-    //console.log(req.body);
-    // customer.save().then((customer)=>{
-    //     res.status(200).send({status: "success",customer})
-    // }).catch((e)=>{
-    //     res.status(400).send({status: "faliure"})
-    // })
 });
 
+customerRoute.route("/get-all").get((req,res)=>{
+
+    Customer.find()
+    .then((model) => {
+        if(Array.isArray(model) && model.length > 0){
+            res.status(200).send({ status: true, data: model });
+        }
+        else{
+            res.status(400).send({ status: false });
+        }
+      
+    })
+    .catch((e) => {
+      res.status(400).send({ status: false });
+    });
+
+});
 
 
 

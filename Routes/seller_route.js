@@ -35,6 +35,17 @@ sellerRoute.route("/get-all").get((req, res) => {
     });
 });
 
+sellerRoute.route("/get-ById/:id").get((req, res) => {
+  const { id } = req.params;
+  Seller.find({_id:id})
+    .then((seller) => {
+      res.status(200).send({ status: "success", seller });
+    })
+    .catch((e) => {
+      res.status(400).send({ status: "failure" });
+    });
+});
+
 sellerRoute.route("/login").post((req,res)=>{
   const {sellerContactNumber,sellerPassword}=req.body;
 

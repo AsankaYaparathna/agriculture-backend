@@ -20,7 +20,7 @@ const prodoutsSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "productCategory",
   },
-  AvailableQuantity: {
+  availableQuantity: {
     type: Number,
   },
     sellerId: {
