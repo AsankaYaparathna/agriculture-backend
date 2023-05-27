@@ -1,24 +1,24 @@
 const express = require("express")
 const productsRoute = express.Router()
-const Products = require("../Models/products")
+const model = require("../Models/products")
 const productCategory = require("../Models/product_category")
 
 productsRoute.route("/save").post((req,res)=>{
 
-    const {productName,price,productImage,description,productCatogoryId,availableQuantity,sellerId}=req.body
-    const Product = new Products({
-        productName,
-        price,
-        productImage,
-        description,
-        productCatogoryId,
-        availableQuantity,
-        sellerId
-    });
+    // const {productName,price,productImage,description,productCatogoryId,availableQuantity,sellerId}=req.body
+    // const Product = new Products({
+    //     productName,
+    //     price,
+    //     productImage,
+    //     description,
+    //     productCatogoryId,
+    //     availableQuantity,
+    //     sellerId
+    // });
 
     
     
-    Product.save().then((product)=>{
+    model.create(req.body).then((product)=>{
         res.status(200).send({status: "success",product})
     }).catch((e)=>{
         res.status(400).send({status: "faliure"})
@@ -26,7 +26,7 @@ productsRoute.route("/save").post((req,res)=>{
 });
 
 productsRoute.route("/get-all").get((req, res) => {
-    Products.find()
+  model.find()
       .then((product) => {
         res.status(200).send({ status: true, data:product });
       })
@@ -38,7 +38,7 @@ productsRoute.route("/get-all").get((req, res) => {
 
 productsRoute.route("/user-produts/:id").get((req,res)=>{
     const { id } = req.params;
-    Products.find({sellerId : id})
+    model.find({sellerId : id})
     .then((model) => {
         if(Array.isArray(model) && model.length > 0){
             res.status(200).send({ status: true, data: model });
@@ -60,7 +60,7 @@ productsRoute.route("/user-produts/:id").get((req,res)=>{
       let vegCount = 0;
       let otherCount = 0;
   
-      const modelP = await Products.find({ sellerId: id });
+      const modelP = await model.find({ sellerId: id });
   
       if (Array.isArray(modelP) && modelP.length > 0) {
         const modelC = await productCategory.find();
@@ -89,35 +89,65 @@ productsRoute.route("/user-produts/:id").get((req,res)=>{
     }
   });
 
-  productsRoute.route("/delete/:id").post((req, res) => {
+  productsRoute.route("/get-estimated-income/:id").post(async (req, res) => {
     const { id } = req.params;
+    const { month } = req.body;
   
-    Product.findByIdAndDelete(id)
-      .then((product) => {
-        if (product) {
-          res.status(200).send({ status: "success", product });
-        } else {
-          res.status(404).send({ status: "failure", message: "Product not found" });
-        }
-      })
-      .catch((error) => {
-        res.status(500).send({ status: "failure", message: "Internal server error" });
-      });
+    try {
+      const products = await model.find({ sellerId: id, createdDate: { $regex: `^${month}` } });
+  
+      if (products.length > 0) {
+        let totalIncome = 0;
+  
+        products.forEach((product) => {
+          const income = product.price * product.availableQuantity;
+          totalIncome += income;
+        });
+  
+        res.status(200).send({ status: "success", totalIncome });
+      } else {
+        res.status(404).send({ status: "failure", message: "No products found for the seller and month" });
+      }
+    } catch (error) {
+      res.status(500).send({ status: "failure", message: "Internal server error" });
+    }
   });
   
-  productsRoute.route("/edit/:id").post((req, res) => {
+  
+
+ const mongoose = require('mongoose');
+
+productsRoute.route("/delete/:id").delete((req, res) => {
+  const { id } = req.params;
+  const { sellerId } = req.body;
+
+  model.find({_id:id,sellerId:sellerId})
+    .then((product) => {
+      if (product[0] !== undefined) {
+        console.log(product);
+          model.findByIdAndDelete(id)
+            .then((deletedProduct) => {
+              res.status(200).send({ status: true,message:'Deleted', product: deletedProduct });
+            })
+            .catch((error) => {
+              res.status(500).send({ status: false, message: "Internal server error" });
+            });
+       
+      } else {
+        res.status(404).send({ status: false, message: "Product not found or Seller Id does not match" });
+      }
+    })
+    .catch((error) => {
+      res.status(500).send({ status: false, message: "Internal server error" });
+    });
+});
+
+  
+  productsRoute.route("/edit/:id").post( (req, res) => {
     const { id } = req.params;
     const { productName, price, productImage, description, productCatogoryId, availableQuantity, sellerId } = req.body;
   
-    Product.findByIdAndUpdate(id, {
-      productName,
-      price,
-      productImage,
-      description,
-      productCatogoryId,
-      availableQuantity,
-      sellerId
-    })
+    model.findByIdAndUpdate(id, req.body)
       .then((product) => {
         if (product) {
           res.status(200).send({ status: "success", product });
@@ -130,5 +160,24 @@ productsRoute.route("/user-produts/:id").get((req,res)=>{
       });
   });
   
+  productsRoute.route("/image-upload/:id").post(async (req, res) => {
+    const { id } = req.params;
+
+    const existProduct = await model.find({_id:id});
+    existProduct[0].productImage = req.body.productImage;
+    model.findByIdAndUpdate(id, existProduct[0])
+      .then((product) => {
+        if (product) {
+          res.status(200).send({ status: "success", data:req.body.productImage });
+        } else {
+          res.status(404).send({ status: "failure", message: "Product not found" });
+        }
+      })
+      .catch((error) => {
+        res.status(500).send({ status: "failure", message: "Internal server error" });
+      });
+  });
+  
+
 
 module.exports =productsRoute
